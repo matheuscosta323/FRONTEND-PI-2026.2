@@ -34,3 +34,32 @@ export function renderGrafico(canvas, leituras) {
     },
   });
 }
+
+// Gráfico de uma métrica (usado na página do lote). Um por canvas.
+const graficosLote = {};
+
+export function renderGraficoLinha(canvas, leituras, campo, cor) {
+  const span = leituras.length ? leituras[leituras.length - 1].data - leituras[0].data : 0;
+  const labels = leituras.map((l) => (span < 24 * 3600 * 1000 ? hhmm(l.data) : diaCurto(l.data)));
+  const valores = leituras.map((l) => l[campo]);
+
+  const existente = graficosLote[canvas.id];
+  if (existente) {
+    existente.data.labels = labels;
+    existente.data.datasets[0].data = valores;
+    return existente.update();
+  }
+  graficosLote[canvas.id] = new Chart(canvas, {
+    type: "line",
+    data: { labels, datasets: [{ data: valores, borderColor: cor, tension: 0.4, borderWidth: 2, pointRadius: 0, pointHoverRadius: 4 }] },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      interaction: { mode: "index", intersect: false },
+      plugins: { legend: { display: false } },
+      scales: {
+        x: { grid: { display: false }, border: { display: false }, ticks: { maxTicksLimit: 7, maxRotation: 0, color: "#6b746d" } },
+        y: { border: { display: false }, grid: { color: "#eef0ea" }, ticks: { color: "#6b746d" } },
+      },
+    },
+  });
+}
