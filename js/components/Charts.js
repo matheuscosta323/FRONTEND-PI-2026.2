@@ -1,9 +1,10 @@
-import { diaCurto } from "../utils/format.js";
+import { diaCurto, hhmm } from "../utils/format.js";
 
 let grafico;
 
 export function renderGrafico(canvas, leituras) {
-  const labels = leituras.map((l) => diaCurto(l.data));
+  const span = leituras.at(-1).data - leituras[0].data;
+  const labels = leituras.map((l) => (span < 24 * 3600 * 1000 ? hhmm(l.data) : diaCurto(l.data)));
   const temp = leituras.map((l) => l.temperatura);
   const umid = leituras.map((l) => l.umidade);
 

@@ -2,20 +2,9 @@ import { CONFIG } from "../config.js";
 
 const BASE = "https://api.thingspeak.com/channels";
 
-// Gera dados fictícios enquanto o channelId estiver vazio, para o layout poder ser testado.
-function dadosDemo(n) {
-  const agora = Date.now(), passo = (6 * 24 * 3600 * 1000) / n;
-  return Array.from({ length: n }, (_, i) => ({
-    data: new Date(agora - (n - 1 - i) * passo),
-    temperatura: 26 + 3 * Math.sin(i / 6) + i * 0.03,
-    umidade: 60 + 8 * Math.sin(i / 9 + 1) + i * 0.2,
-  }));
-}
-
 export async function buscarLeituras() {
   const { channelId, readApiKey, results, fields } = CONFIG;
   if (!channelId) {
-    console.warn("[ThingSpeak] channelId vazio em config.js: usando dados de demonstração.");
     return { leituras: dadosDemo(results), demo: true };
   }
   const params = new URLSearchParams({ results });

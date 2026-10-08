@@ -30,5 +30,4 @@ function iniciar() {
   setInterval(atualizar, CONFIG.refreshMs);
 }
 
-// Scripts com defer: Chart.js e Lucide já estão carregados quando o módulo roda.
 iniciar();
