@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Lotes | NomeProjeto</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../css/variables.css">
+  <link rel="stylesheet" href="../css/layout.css">
+  <link rel="stylesheet" href="../css/components.css">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js" defer></script>
+  <script src="https://cdn.jsdelivr.net/npm/lucide@0.469.0/dist/umd/lucide.min.js" defer></script>
+  <script type="module" src="../js/pages/lotes.js" defer></script>
+</head>
+<body>
+  <aside class="sidebar" id="menu"></aside>
+  <div class="content">
+    <header class="topbar">
+      <h1 id="greeting">Bom dia, Rafael</h1>
+      <p id="updatedAt">Atualizada às --:--</p>
+    </header>
+    <main class="page">
+      <div class="page-head">
+        <h2>Lotes Monitorados</h2>
+        <a class="btn-outline" href="../index.html"><i data-lucide="arrow-left"></i>Voltar ao dashboard</a>
+      </div>
+      <section class="kpis duas" id="kpis"></section>
+      <section class="card">
+        <div class="table-scroll">
+          <table class="table grande">
+            <thead><tr><th>Lote</th><th>Fruta</th><th>Status</th><th>Última leitura</th><th></th></tr></thead>
+            <tbody id="lotesBody"></tbody>
+          </table>
+        </div>
+      </section>
+      <nav class="paginacao" id="paginacao"></nav>
+    </main>
+  </div>
+</body>
+</html>
