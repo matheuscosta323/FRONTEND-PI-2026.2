@@ -9,7 +9,6 @@ const $ = (id) => document.getElementById(id);
 const codigo = new URLSearchParams(location.search).get("codigo");
 let leituras = [];
 
-// só as leituras dos últimos "dias" dias
 const recentes = (dias) => leituras.filter((l) => l.data.getTime() >= Date.now() - dias * 864e5);
 
 function desenharGraficos() {
@@ -43,11 +42,3 @@ montarMenu("lotes", "../");
 $("greeting").textContent = `${saudacao()}, Rafael`;
 $("periodoUmidade").onchange = desenharGraficos;
 $("periodoTemp").onchange = desenharGraficos;
-
-// botão de ligar: usa o telefone do config.js
-const ligar = $("ligar");
-if (CONFIG.telefoneTransportadora) ligar.href = "tel:" + CONFIG.telefoneTransportadora;
-else { ligar.classList.add("desativado"); ligar.title = "Defina telefoneTransportadora no config.js"; }
-
-carregar();
-setInterval(carregar, CONFIG.refreshMs);

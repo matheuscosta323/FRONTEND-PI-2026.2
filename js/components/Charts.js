@@ -35,7 +35,6 @@ export function renderGrafico(canvas, leituras) {
   });
 }
 
-// Gráfico de uma métrica (usado na página do lote). Um por canvas.
 const graficosLote = {};
 
 export function renderGraficoLinha(canvas, leituras, campo, cor) {
