@@ -27,7 +27,6 @@ export function renderStats(el, leituras) {
       <div><small>Umidade do ar</small><strong>${u == null ? "--" : num(u, 0) + "%"}</strong><small>leitura recente</small></div></div>`;
 }
 
-// opcoes: prefixo do link ("pages/" no index, "" dentro de pages/), seta no fim da linha e lista de alertas
 export function renderLotes(tbody, lotes, { prefixo = "pages/", seta = false, alertas = null } = {}) {
   tbody.innerHTML = lotes.map((l) => {
     const href = `${prefixo}lote.html?codigo=${l.codigo}`;
@@ -43,7 +42,6 @@ export function renderLotes(tbody, lotes, { prefixo = "pages/", seta = false, al
   }).join("");
 }
 
-// alertas do lote (página de detalhe)
 export function renderAlertasLote(el, alertas) {
   el.innerHTML = alertas.length
     ? alertas.map((a) => `
@@ -53,7 +51,6 @@ export function renderAlertasLote(el, alertas) {
     : `<p class="empty">Nenhum alerta neste lote.</p>`;
 }
 
-// botões de página: < 1 2 3 >
 export function renderPaginacao(el, atual, total, aoMudar) {
   el.innerHTML = "";
   const botao = (texto, pagina, ativo = false) => {
