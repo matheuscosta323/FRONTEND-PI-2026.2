@@ -163,30 +163,17 @@
   </div>
 
   <script>
-    // ====== CONFIGURAÇÃO ======
-    const REDIRECT_URL = 'perfil.html';          // para onde ir após o login
+    const REDIRECT_URL = '../index.html';
     const REMEMBER_KEY = 'agroops:remembered-email';
 
-    // ====== SUBSTITUA PELA SUA API ======
-    // Deve resolver em caso de sucesso e rejeitar (throw) em caso de erro.
     async function authenticate(email, password) {
-      // Exemplo real:
-      // const res = await fetch('/api/auth/login', {
-      //   method: 'POST',
-      //   headers: { 'Content-Type': 'application/json' },
-      //   body: JSON.stringify({ email, password })
-      // });
-      // if (!res.ok) throw new Error('E-mail ou senha incorretos.');
-      // return res.json();
-      await new Promise((r) => setTimeout(r, 1200)); // simulação
+      await new Promise((r) => setTimeout(r, 1200));
     }
 
     async function requestPasswordReset(email) {
-      // await fetch('/api/auth/forgot-password', { method: 'POST', ... });
-      await new Promise((r) => setTimeout(r, 900)); // simulação
+      await new Promise((r) => setTimeout(r, 900));
     }
 
-    // ====== ELEMENTOS ======
     const $ = (id) => document.getElementById(id);
     const emailInput = $('email');
     const passwordInput = $('password');
