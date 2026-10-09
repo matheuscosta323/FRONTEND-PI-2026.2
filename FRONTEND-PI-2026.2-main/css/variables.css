@@ -1,0 +1,22 @@
+:root {
+  --verde-900: #14402f;
+  --verde-800: #1b5039;
+  --verde-600: #2d6a4f;
+  --verde-100: #e3efe8;
+  --fundo: #f4f5f1;
+  --superficie: #ffffff;
+  --borda: #e4e6df;
+  --texto: #1c241f;
+  --texto-suave: #6b746d;
+  --temp: #b8964f;
+  --temp-bg: #f8efdc;
+  --umid: #4f86a0;
+  --umid-bg: #e4eef3;
+  --ok: #2d6a4f;   --ok-bg: #e0efe6;
+  --aviso: #b7791f; --aviso-bg: #fbeed5;
+  --erro: #b83a35;  --erro-bg: #f9e0de;
+  --neutro: #6b746d; --neutro-bg: #eceee8;
+  --raio: 14px;
+  --sidebar: 224px;
+  --fonte: "Inter", system-ui, -apple-system, "Segoe UI", sans-serif;
+}
