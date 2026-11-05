@@ -1,0 +1,30 @@
+/*
+ * Camadas explícitas: CSS fora de camada venceria qualquer utilitário do Tailwind,
+ * então as folhas originais entram em base/components e os utilitários têm a palavra final.
+ */
+@layer theme, base, components, utilities;
+
+@import "tailwindcss/theme.css" layer(theme);
+@import "tailwindcss/preflight.css" layer(base);
+@import "tailwindcss/utilities.css" layer(utilities);
+
+@import "../styles/variables.css";
+@import "../styles/base.css" layer(base);
+@import "../styles/layout.css" layer(components);
+@import "../styles/components.css" layer(components);
+
+@theme inline {
+  --font-sans: var(--fonte);
+  --color-brand: var(--verde-800);
+  --color-brand-hover: var(--verde-900);
+  --color-brand-focus: var(--verde-600);
+  --color-brand-subtle: var(--verde-100);
+  --color-fundo: var(--fundo);
+  --color-borda: var(--borda);
+  --color-texto: var(--texto);
+  --color-texto-suave: var(--texto-suave);
+  --color-erro: var(--erro);
+  --color-erro-bg: var(--erro-bg);
+  --color-ok: var(--ok);
+  --color-ok-bg: var(--ok-bg);
+}
