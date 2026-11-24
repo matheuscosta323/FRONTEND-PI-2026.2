@@ -61,8 +61,8 @@ function BlocoGrafico({ leituras, referencia, linha, titulo, classeLegenda }: Bl
   );
 }
 
-const LINHA_UMIDADE: LinhaGrafico = { campo: "umidade", nome: "Umidade do ar (%)", cor: "#4f86a0" };
-const LINHA_TEMPERATURA: LinhaGrafico = { campo: "temperatura", nome: "Temperatura (°C)", cor: "#b8964f" };
+const LINHA_UMIDADE: LinhaGrafico = { campo: "umidade", nome: "Umidade do solo (%)", cor: "#4f86a0" };
+const LINHA_TEMPERATURA: LinhaGrafico = { campo: "temperatura", nome: "Temperatura do solo (°C)", cor: "#b8964f" };
 
 export function LoteView({ codigo }: { codigo: string }) {
   const buscarDetalhe = useCallback(() => buscarLote(codigo), [codigo]);
@@ -112,11 +112,11 @@ export function LoteView({ codigo }: { codigo: string }) {
           {dados && (
             <>
               <KpiCard
-                rotulo="Temperatura média do lote"
+                rotulo="Temperatura média do solo"
                 valor={dados.mediaTemperatura != null ? num(dados.mediaTemperatura) + "°C" : "--"}
               />
               <KpiCard
-                rotulo="Umidade média do lote"
+                rotulo="Umidade média do solo"
                 valor={dados.mediaUmidade != null ? num(dados.mediaUmidade, 0) + "%" : "--"}
               />
             </>
@@ -132,14 +132,14 @@ export function LoteView({ codigo }: { codigo: string }) {
               leituras={leituras}
               referencia={referencia}
               linha={LINHA_UMIDADE}
-              titulo="Umidade do ar"
+              titulo="Umidade do solo"
               classeLegenda="dot-umid"
             />
             <BlocoGrafico
               leituras={leituras}
               referencia={referencia}
               linha={LINHA_TEMPERATURA}
-              titulo="Temperatura"
+              titulo="Temperatura do solo"
               classeLegenda="dot-temp"
             />
           </section>

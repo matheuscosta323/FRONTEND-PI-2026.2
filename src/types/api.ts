@@ -1,7 +1,7 @@
 /** Envelope devolvido pelos controllers da API Flask. */
 export interface ApiSucesso<T> {
   success: true;
-  message: string;
+  message?: string;
   data: T;
 }
 

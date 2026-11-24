@@ -14,8 +14,8 @@ import { usePolling } from "@/hooks/use-polling";
 import type { Leitura, LinhaGrafico } from "@/types/monitoramento";
 
 const LINHAS: LinhaGrafico[] = [
-  { campo: "temperatura", nome: "Temperatura (°C)", cor: "#b8964f" },
-  { campo: "umidade", nome: "Umidade do ar (%)", cor: "#4f86a0" },
+  { campo: "temperatura", nome: "Temperatura do solo (°C)", cor: "#b8964f" },
+  { campo: "umidade", nome: "Umidade do solo (%)", cor: "#4f86a0" },
 ];
 
 async function buscarDashboard() {
@@ -79,24 +79,23 @@ export function DashboardView() {
               <div className="legend">
                 <span>
                   <i className="dot dot-temp" />
-                  Temperatura
+                  Temperatura do solo
                 </span>
                 <span>
                   <i className="dot dot-umid" />
-                  Umidade do ar
+                  Umidade do solo
                 </span>
               </div>
               <GraficoLinhas
                 leituras={leituras}
                 linhas={LINHAS}
-                rotulo="Temperatura e umidade do ar ao longo do tempo"
+                rotulo="Temperatura e umidade do solo ao longo do tempo"
               />
             </div>
             <div className="side-stats">
               {erro && !dados ? (
                 <p className="empty">
-                  Não foi possível falar com o Node-RED. Verifique se ele está rodando em{" "}
-                  {CONFIG.noderedUrl}.
+                  Não foi possível falar com o servidor em {CONFIG.apiUrl}.
                 </p>
               ) : (
                 <>
@@ -105,7 +104,7 @@ export function DashboardView() {
                       <Thermometer aria-hidden="true" />
                     </span>
                     <div>
-                      <small>Temperatura</small>
+                      <small>Temperatura do solo</small>
                       <strong>{temperaturaMedia(leituras)}</strong>
                       <small>média observada</small>
                     </div>
@@ -115,7 +114,7 @@ export function DashboardView() {
                       <Droplets aria-hidden="true" />
                     </span>
                     <div>
-                      <small>Umidade do ar</small>
+                      <small>Umidade do solo</small>
                       <strong>{umidadeRecente(leituras)}</strong>
                       <small>leitura recente</small>
                     </div>

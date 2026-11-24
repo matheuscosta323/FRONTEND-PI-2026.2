@@ -28,7 +28,7 @@ interface ItemMenu {
 const MONITORAMENTO: ItemMenu[] = [
   { href: "/", icone: LayoutGrid, nome: "Visão geral" },
   { href: "/lotes", icone: Map, nome: "Lotes" },
-  { href: "/sensores", icone: RadioTower, nome: "Sensores" },
+  { href: "/relatorio", icone: RadioTower, nome: "Sensores" },
   { href: "/alertas", icone: Bell, nome: "Alertas" },
 ];
 
@@ -47,7 +47,10 @@ export function Sidebar() {
   const gestao = sessao?.role === "admin" ? [...GESTAO, CADASTRO] : GESTAO;
 
   function renderItem({ href, icone: Icone, nome }: ItemMenu) {
-    const ativo = href === "/" ? pathname === "/" : pathname.startsWith(href);
+    const ativo =
+      href === "/"
+        ? pathname === "/"
+        : pathname.startsWith(href) || (href === "/relatorio" && pathname.startsWith("/sensores"));
     return (
       <Link
         key={href}

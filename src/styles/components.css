@@ -78,3 +78,12 @@ select { font: inherit; font-size: 12px; padding: 6px 10px; border: 1px solid va
 @media (max-width: 1100px) { .lote-grid { grid-template-columns: 1fr; } }
 @media (max-width: 800px) { .kpis.duas { grid-template-columns: 1fr; } }
 .table .seta a { display: inline-flex; }
+
+/* Relatório de condições */
+.kpis.quatro { grid-template-columns: repeat(4, 1fr); }
+@media (max-width: 1200px) { .kpis.quatro { grid-template-columns: repeat(2, 1fr); } }
+@media (max-width: 640px) { .kpis.quatro { grid-template-columns: 1fr; } }
+
+.relatorio-grid-duas { display: grid; grid-template-columns: 1fr 412px; gap: 20px; }
+@media (max-width: 1100px) { .relatorio-grid-duas { grid-template-columns: 1fr; } }
+

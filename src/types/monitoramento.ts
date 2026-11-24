@@ -69,3 +69,32 @@ export interface LinhaGrafico {
   nome: string;
   cor: string;
 }
+
+export interface BackendLote {
+  id: number;
+  fruta: string;
+  status: string;
+  temp_ideal_min: number;
+  temp_ideal_max: number;
+  umidade_ar_ideal_min?: number | null;
+  umidade_ar_ideal_max?: number | null;
+  umidade_solo_ideal_min?: number | null;
+  umidade_solo_ideal_max?: number | null;
+  usuario_id: number;
+}
+
+export interface BackendSensor {
+  id: number;
+  nome: string;
+  lote_id: number;
+}
+
+export interface BackendRegistro {
+  id: number;
+  temperatura_celsius: number;
+  umidade_ar?: number | null;
+  umidade_solo?: number | null;
+  status: string;
+  tempo_registro: string | null;
+  sensor_id: number;
+}

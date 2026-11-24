@@ -42,17 +42,40 @@ export async function enviar<T>(caminho: string, corpo: unknown, token?: string)
   throw new ApiError("Erro interno no servidor.", resposta.status);
 }
 
-/** GET no Node-RED. */
+/** GET na API Flask; devolve `data` ou lança `ApiError` com a mensagem do servidor. */
 export async function buscar<T>(
   caminho: string,
   params: Record<string, string | number> = {},
+  token?: string,
 ): Promise<T> {
   const query = new URLSearchParams(
     Object.entries(params).map(([chave, valor]) => [chave, String(valor)]),
   );
-  const resposta = await fetch(`${CONFIG.noderedUrl}${caminho}?${query}`);
-  if (!resposta.ok) {
-    throw new ApiError(`Node-RED respondeu ${resposta.status} em ${caminho}`, resposta.status);
+  const qs = query.toString();
+  const url = `${CONFIG.apiUrl}${caminho}${qs ? `?${qs}` : ""}`;
+
+  let resposta: Response;
+  try {
+    resposta = await fetch(url, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        ...(token ? { Authorization: `Bearer ${token}` } : {}),
+      },
+    });
+  } catch {
+    throw new ApiError(ERRO_CONEXAO, 0);
   }
-  return resposta.json() as Promise<T>;
+
+  const json = (await resposta.json().catch(() => null)) as ApiResposta<T> | JwtFalha | null;
+
+  if (json && "msg" in json) throw new ApiError(ERRO_SESSAO, resposta.status, true);
+  if (json && "success" in json) {
+    if (json.success) return json.data;
+    throw new ApiError(json.message ?? "Erro na requisição.", resposta.status);
+  }
+  if (resposta.ok && json) {
+    return json as unknown as T;
+  }
+  throw new ApiError("Erro interno no servidor.", resposta.status);
 }

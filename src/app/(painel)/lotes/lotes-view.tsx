@@ -68,7 +68,7 @@ export function LotesView() {
                 {erro && !dados ? (
                   <tr>
                     <td colSpan={5} className="empty">
-                      Não foi possível falar com o Node-RED em {CONFIG.noderedUrl}.
+                      Não foi possível falar com o servidor em {CONFIG.apiUrl}.
                     </td>
                   </tr>
                 ) : (
