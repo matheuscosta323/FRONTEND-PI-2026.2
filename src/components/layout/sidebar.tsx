@@ -4,13 +4,11 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
   Bell,
-  Building2,
   LayoutGrid,
   Map,
   RadioTower,
   Sprout,
   UserPlus,
-  Users,
   type LucideIcon,
 } from "lucide-react";
 import { APP_NOME } from "@/lib/config";
@@ -32,11 +30,6 @@ const MONITORAMENTO: ItemMenu[] = [
   { href: "/alertas", icone: Bell, nome: "Alertas" },
 ];
 
-const GESTAO: ItemMenu[] = [
-  { href: "/propriedades", icone: Building2, nome: "Propriedades" },
-  { href: "/equipe", icone: Users, nome: "Equipe" },
-];
-
 const CADASTRO: ItemMenu = { href: "/cadastro", icone: UserPlus, nome: "Cadastrar usuário" };
 
 export function Sidebar() {
@@ -44,7 +37,8 @@ export function Sidebar() {
   const { sessao } = useSessao();
   const qtdAlertas = useAlertas()?.length ?? 0;
 
-  const gestao = sessao?.role === "admin" ? [...GESTAO, CADASTRO] : GESTAO;
+  // Só exibe itens de gestão que têm tela implementada.
+  const gestao = sessao?.role === "admin" ? [CADASTRO] : [];
 
   function renderItem({ href, icone: Icone, nome }: ItemMenu) {
     const ativo =
@@ -75,8 +69,12 @@ export function Sidebar() {
       </Link>
       <nav className="nav">
         {MONITORAMENTO.map(renderItem)}
-        <p className="nav-group">Gestão</p>
-        {gestao.map(renderItem)}
+        {gestao.length > 0 && (
+          <>
+            <p className="nav-group">Gestão</p>
+            {gestao.map(renderItem)}
+          </>
+        )}
       </nav>
       {sessao && (
         <Link className="user" href="/perfil">

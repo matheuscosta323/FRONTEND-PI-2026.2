@@ -1,7 +1,7 @@
 "use client";
 
 import { createContext, useContext, type ReactNode } from "react";
-import { buscarAlertas } from "@/lib/api/nodered";
+import { buscarAlertas } from "@/lib/api/monitoramento";
 import { usePolling } from "@/hooks/use-polling";
 import type { Alerta } from "@/types/monitoramento";
 

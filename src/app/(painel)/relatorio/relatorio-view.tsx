@@ -61,11 +61,13 @@ function formatarDataHora(dataIso?: string | null): { data: string; hora: string
 export function RelatorioView() {
   const [dias, setDias] = useState<number>(7);
   const [loteId, setLoteId] = useState<string>("todos");
-  const { dados, erro, atualizadoEm } = usePolling(carregarRelatorio);
+  const { dados, atualizadoEm } = usePolling(carregarRelatorio);
 
-  const lotes = dados?.lotes ?? [];
-  const sensores = dados?.sensores ?? [];
-  const registros = dados?.registros ?? [];
+  // Referência estável para os cálculos de período (evita Date.now() no render).
+  const agora = atualizadoEm?.getTime() ?? 0;
+  const lotes = useMemo(() => dados?.lotes ?? [], [dados]);
+  const sensores = useMemo(() => dados?.sensores ?? [], [dados]);
+  const registros = useMemo(() => dados?.registros ?? [], [dados]);
 
   const loteAtivo = useMemo(() => {
     if (loteId === "todos") return null;
@@ -82,7 +84,6 @@ export function RelatorioView() {
   }, [sensoresFiltrados]);
 
   const { leiturasAtuais, registrosAtuais, leiturasAnteriores } = useMemo(() => {
-    const agora = Date.now();
     const inicioAtual = agora - dias * 24 * 60 * 60 * 1000;
     const inicioAnterior = agora - dias * 2 * 24 * 60 * 60 * 1000;
 
@@ -105,6 +106,7 @@ export function RelatorioView() {
         data: r.tempo_registro ?? new Date().toISOString(),
         temperatura: r.temperatura_celsius,
         umidade: r.umidade_solo ?? r.umidade_ar ?? 0,
+        umidadeAr: r.umidade_ar ?? 0,
       }));
 
     return {
@@ -112,7 +114,7 @@ export function RelatorioView() {
       registrosAtuais: atuais,
       leiturasAnteriores: mapLeituras(anteriores),
     };
-  }, [registros, sensorIdsSet, dias]);
+  }, [registros, sensorIdsSet, dias, agora]);
 
   const metricas = useMemo(() => {
     const total = leiturasAtuais.length;

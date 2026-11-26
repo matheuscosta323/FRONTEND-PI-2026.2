@@ -1,13 +1,13 @@
 "use client";
 
 import Link from "next/link";
-import { ArrowRight, ChevronRight, Droplets, Thermometer, ThermometerSun } from "lucide-react";
+import { ArrowRight, ChevronRight, Droplets, Thermometer, ThermometerSun, Wind } from "lucide-react";
 import { useAlertas } from "@/components/layout/alertas-provider";
 import { Topbar } from "@/components/layout/topbar";
 import { GraficoLinhas } from "@/components/monitoramento/grafico-linhas";
 import { KpiCard } from "@/components/monitoramento/kpi-card";
 import { LinhasLotes } from "@/components/monitoramento/tabela-lotes";
-import { buscarLeituras, buscarResumo } from "@/lib/api/nodered";
+import { buscarLeituras, buscarResumo } from "@/lib/api/monitoramento";
 import { CONFIG } from "@/lib/config";
 import { haMin, num } from "@/lib/format";
 import { usePolling } from "@/hooks/use-polling";
@@ -16,6 +16,7 @@ import type { Leitura, LinhaGrafico } from "@/types/monitoramento";
 const LINHAS: LinhaGrafico[] = [
   { campo: "temperatura", nome: "Temperatura do solo (°C)", cor: "#b8964f" },
   { campo: "umidade", nome: "Umidade do solo (%)", cor: "#4f86a0" },
+  { campo: "umidadeAr", nome: "Umidade do ar (%)", cor: "#6f9a72" },
 ];
 
 async function buscarDashboard() {
@@ -29,9 +30,14 @@ function temperaturaMedia(leituras: Leitura[]): string {
   return num(soma / leituras.length) + " °C";
 }
 
-function umidadeRecente(leituras: Leitura[]): string {
+function umidadeSoloRecente(leituras: Leitura[]): string {
   const ultima = leituras[leituras.length - 1];
   return ultima ? num(ultima.umidade, 0) + "%" : "--";
+}
+
+function umidadeArRecente(leituras: Leitura[]): string {
+  const ultima = leituras[leituras.length - 1];
+  return ultima ? num(ultima.umidadeAr, 0) + "%" : "--";
 }
 
 export function DashboardView() {
@@ -85,11 +91,15 @@ export function DashboardView() {
                   <i className="dot dot-umid" />
                   Umidade do solo
                 </span>
+                <span>
+                  <i className="dot dot-ar" />
+                  Umidade do ar
+                </span>
               </div>
               <GraficoLinhas
                 leituras={leituras}
                 linhas={LINHAS}
-                rotulo="Temperatura e umidade do solo ao longo do tempo"
+                rotulo="Temperatura, umidade do solo e umidade do ar ao longo do tempo"
               />
             </div>
             <div className="side-stats">
@@ -115,7 +125,17 @@ export function DashboardView() {
                     </span>
                     <div>
                       <small>Umidade do solo</small>
-                      <strong>{umidadeRecente(leituras)}</strong>
+                      <strong>{umidadeSoloRecente(leituras)}</strong>
+                      <small>leitura recente</small>
+                    </div>
+                  </div>
+                  <div className="stat">
+                    <span className="stat-icon ar">
+                      <Wind aria-hidden="true" />
+                    </span>
+                    <div>
+                      <small>Umidade do ar</small>
+                      <strong>{umidadeArRecente(leituras)}</strong>
                       <small>leitura recente</small>
                     </div>
                   </div>

@@ -1,4 +1,4 @@
-/* Contratos do Node-RED, deduzidos do uso feito pelas telas (não há fluxos versionados no repositório). */
+/* Contratos da API Flask (backend/app), deduzidos das respostas das rotas /api. */
 
 export type Fruta = "uva" | "manga";
 export type StatusLote = "saudavel" | "atencao" | "critico" | "estavel";
@@ -8,7 +8,10 @@ export interface Leitura {
   /** Data ISO 8601. */
   data: string;
   temperatura: number;
+  /** Umidade do solo (%). */
   umidade: number;
+  /** Umidade do ar (%). */
+  umidadeAr: number;
 }
 
 export interface LoteResumo {
@@ -65,7 +68,7 @@ export interface DetalheLote {
 
 /** Série desenhada no gráfico. */
 export interface LinhaGrafico {
-  campo: "temperatura" | "umidade";
+  campo: "temperatura" | "umidade" | "umidadeAr";
   nome: string;
   cor: string;
 }

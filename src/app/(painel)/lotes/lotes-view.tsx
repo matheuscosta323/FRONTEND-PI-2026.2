@@ -7,7 +7,7 @@ import { useAlertas } from "@/components/layout/alertas-provider";
 import { Topbar } from "@/components/layout/topbar";
 import { KpiCard } from "@/components/monitoramento/kpi-card";
 import { LinhasLotes } from "@/components/monitoramento/tabela-lotes";
-import { buscarLotes, buscarResumo } from "@/lib/api/nodered";
+import { buscarLotes, buscarResumo } from "@/lib/api/monitoramento";
 import { CONFIG } from "@/lib/config";
 import { usePolling } from "@/hooks/use-polling";
 

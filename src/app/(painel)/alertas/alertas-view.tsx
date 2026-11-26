@@ -48,9 +48,12 @@ export function AlertasView() {
   const [feedbackIrrigacao, setFeedbackIrrigacao] = useState<string | null>(null);
 
   const { dados, atualizadoEm } = usePolling(carregarAvisos);
-  const lotes = dados?.lotes ?? [];
-  const sensores = dados?.sensores ?? [];
-  const registros = dados?.registros ?? [];
+
+  // Referência estável para calcular "há X min" sem chamar Date.now() no render.
+  const agora = atualizadoEm?.getTime() ?? 0;
+  const lotes = useMemo(() => dados?.lotes ?? [], [dados]);
+  const sensores = useMemo(() => dados?.sensores ?? [], [dados]);
+  const registros = useMemo(() => dados?.registros ?? [], [dados]);
 
   const listaAvisos = useMemo<ItemAviso[]>(() => {
     const itens: ItemAviso[] = [];
@@ -60,7 +63,7 @@ export function AlertasView() {
       const lote = sensor ? lotes.find((l) => l.id === sensor.lote_id) : null;
       const loteCodigo = lote ? `LOTE-${String(lote.id).padStart(2, "0")}` : "Lote";
       const minutos = reg.tempo_registro
-        ? Math.max(0, Math.round((Date.now() - new Date(reg.tempo_registro).getTime()) / 60000))
+        ? Math.max(0, Math.round((agora - new Date(reg.tempo_registro).getTime()) / 60000))
         : null;
 
       if (reg.temperatura_celsius > (lote?.temp_ideal_max ?? 30)) {
@@ -144,7 +147,7 @@ export function AlertasView() {
     });
 
     return itens;
-  }, [registros, sensores, lotes]);
+  }, [registros, sensores, lotes, agora]);
 
   const avisosComStatus = useMemo(() => {
     return listaAvisos.map((aviso) => ({

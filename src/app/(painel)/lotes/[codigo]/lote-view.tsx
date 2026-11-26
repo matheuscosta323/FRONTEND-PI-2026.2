@@ -7,7 +7,7 @@ import { Topbar } from "@/components/layout/topbar";
 import { GraficoLinhas } from "@/components/monitoramento/grafico-linhas";
 import { KpiCard } from "@/components/monitoramento/kpi-card";
 import { ApiError } from "@/lib/api/http";
-import { buscarLote } from "@/lib/api/nodered";
+import { buscarLote } from "@/lib/api/monitoramento";
 import { CONFIG } from "@/lib/config";
 import { haMin, num } from "@/lib/format";
 import { usePolling } from "@/hooks/use-polling";
