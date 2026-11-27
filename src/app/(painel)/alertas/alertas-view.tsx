@@ -16,9 +16,10 @@ import {
 } from "lucide-react";
 import { Topbar } from "@/components/layout/topbar";
 import { buscar } from "@/lib/api/http";
+import { buscarUltimoRegistroThingspeak } from "@/lib/api/monitoramento";
 import { haMin, num } from "@/lib/format";
 import { usePolling } from "@/hooks/use-polling";
-import type { BackendLote, BackendRegistro, BackendSensor } from "@/types/monitoramento";
+import type { BackendLote, BackendSensor } from "@/types/monitoramento";
 
 interface ItemAviso {
   id: string;
@@ -37,7 +38,7 @@ async function carregarAvisos() {
   const [lotes, sensores, registros] = await Promise.all([
     buscar<BackendLote[]>("/lotes"),
     buscar<BackendSensor[]>("/sensores"),
-    buscar<BackendRegistro[]>("/registros"),
+    buscarUltimoRegistroThingspeak(),
   ]);
   return { lotes, sensores, registros };
 }

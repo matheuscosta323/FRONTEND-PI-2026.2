@@ -14,6 +14,7 @@ import {
 import { Topbar } from "@/components/layout/topbar";
 import { GraficoLinhas } from "@/components/monitoramento/grafico-linhas";
 import { buscar } from "@/lib/api/http";
+import { buscarRegistrosThingspeak } from "@/lib/api/monitoramento";
 import { num } from "@/lib/format";
 import { usePolling } from "@/hooks/use-polling";
 import type {
@@ -33,7 +34,7 @@ async function carregarRelatorio() {
   const [lotes, sensores, registros] = await Promise.all([
     buscar<BackendLote[]>("/lotes"),
     buscar<BackendSensor[]>("/sensores"),
-    buscar<BackendRegistro[]>("/registros"),
+    buscarRegistrosThingspeak(),
   ]);
   return { lotes, sensores, registros };
 }

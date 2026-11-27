@@ -1,5 +1,6 @@
 import { ApiError, buscar } from "@/lib/api/http";
 import { CONFIG } from "@/lib/config";
+import type { LeituraThingspeak, RespostaThingspeak } from "@/types/thingspeak";
 import type {
   Alerta,
   AlertaLote,
@@ -36,30 +37,96 @@ function calcularMinutosAtras(dataIso?: string | null): number | null {
   return Math.max(0, diffMin);
 }
 
-function mapearLeitura(reg: BackendRegistro): Leitura {
-  return {
-    data: reg.tempo_registro ?? new Date().toISOString(),
-    temperatura: reg.temperatura_celsius,
-    umidade: reg.umidade_solo ?? reg.umidade_ar ?? 0,
-    umidadeAr: reg.umidade_ar ?? 0,
-  };
+function mapearLeiturasThingspeak(leituras: LeituraThingspeak[]): Leitura[] {
+  // `umidade` é a umidade do solo no contrato usado pelas telas.
+  return leituras.map((leitura) => ({
+    data: leitura.data,
+    temperatura: leitura.temperatura,
+    umidade: leitura.umidadeSolo,
+    umidadeAr: leitura.umidadeAr,
+  }));
+}
+
+async function buscarLeiturasThingspeak(): Promise<Leitura[]> {
+  const { leituras } = await buscarRespostaThingspeak();
+  return mapearLeiturasThingspeak(leituras);
+}
+
+/**
+ * Busca as leituras na rota interna `/api/thingspeak`. A chamada ao ThingSpeak
+ * acontece no servidor Next.js, então a Read API Key não vai para o navegador.
+ */
+async function buscarRespostaThingspeak(): Promise<RespostaThingspeak> {
+  let resposta: Response;
+  try {
+    resposta = await fetch("/api/thingspeak", {
+      method: "GET",
+      headers: { Accept: "application/json" },
+      cache: "no-store",
+    });
+  } catch {
+    throw new ApiError("Não foi possível consultar o ThingSpeak.", 0);
+  }
+
+  const corpo = (await resposta.json().catch(() => null)) as
+    | RespostaThingspeak
+    | { erro?: string }
+    | null;
+
+  if (!resposta.ok) {
+    const mensagem = corpo && "erro" in corpo ? corpo.erro : null;
+    throw new ApiError(mensagem ?? "Não foi possível consultar o ThingSpeak.", resposta.status);
+  }
+
+  if (!corpo || !("leituras" in corpo)) {
+    throw new ApiError("O ThingSpeak retornou uma resposta inválida.", resposta.status);
+  }
+
+  return corpo;
 }
 
 export async function buscarLeituras(): Promise<Leitura[]> {
-  const registros = await buscar<BackendRegistro[]>("/registros");
-  const ordenados = [...registros].sort((a, b) =>
-    (a.tempo_registro ?? "").localeCompare(b.tempo_registro ?? ""),
-  );
+  const leituras = await buscarLeiturasThingspeak();
+  return leituras.slice(-CONFIG.results);
+}
 
-  return ordenados.slice(-CONFIG.results).map(mapearLeitura);
+/**
+ * Adapta as leituras do canal ao formato de registro esperado por relatório e
+ * alertas. Como existe um único canal, elas são associadas ao primeiro sensor
+ * cadastrado no backend (que permanece responsável por lotes e sensores).
+ */
+export async function buscarRegistrosThingspeak(
+  sensores?: BackendSensor[],
+): Promise<BackendRegistro[]> {
+  const lista = sensores ?? (await buscar<BackendSensor[]>("/sensores"));
+  const sensorId = [...lista].sort((a, b) => a.id - b.id)[0]?.id ?? 1;
+  const { leituras } = await buscarRespostaThingspeak();
+
+  return leituras.map((leitura) => ({
+    id: leitura.entryId,
+    temperatura_celsius: leitura.temperatura,
+    umidade_ar: leitura.umidadeAr,
+    umidade_solo: leitura.umidadeSolo,
+    status: "ok",
+    tempo_registro: leitura.data,
+    sensor_id: sensorId,
+  }));
+}
+
+/** A central de avisos e o resumo consideram somente a leitura mais recente. */
+export async function buscarUltimoRegistroThingspeak(
+  sensores?: BackendSensor[],
+): Promise<BackendRegistro[]> {
+  const registros = await buscarRegistrosThingspeak(sensores);
+  return registros.slice(-1);
 }
 
 export async function buscarResumo(): Promise<DadosResumo> {
-  const [lotes, sensores, registros] = await Promise.all([
+  const [lotes, sensores] = await Promise.all([
     buscar<BackendLote[]>("/lotes"),
     buscar<BackendSensor[]>("/sensores"),
-    buscar<BackendRegistro[]>("/registros"),
   ]);
+  const registros = await buscarUltimoRegistroThingspeak(sensores);
 
   const lotesResumo: LoteResumo[] = lotes.map((lote) => {
     const sensoresLote = sensores.filter((s) => s.lote_id === lote.id);
@@ -93,11 +160,11 @@ export async function buscarResumo(): Promise<DadosResumo> {
 }
 
 export async function buscarAlertas(): Promise<Alerta[]> {
-  const [lotes, sensores, registros] = await Promise.all([
+  const [lotes, sensores] = await Promise.all([
     buscar<BackendLote[]>("/lotes"),
     buscar<BackendSensor[]>("/sensores"),
-    buscar<BackendRegistro[]>("/registros"),
   ]);
+  const registros = await buscarUltimoRegistroThingspeak(sensores);
 
   const alertas: Alerta[] = [];
 
@@ -152,38 +219,30 @@ export async function buscarLote(codigo: string, dias = 7): Promise<DetalheLote>
     throw new ApiError("Lote não encontrado.", 404);
   }
 
-  const [lote, sensores, registros] = await Promise.all([
+  const [lote, leituras] = await Promise.all([
     buscar<BackendLote>(`/lotes/${idNumerico}`),
-    buscar<BackendSensor[]>("/sensores"),
-    buscar<BackendRegistro[]>("/registros"),
+    buscarLeiturasThingspeak(),
   ]);
 
   const limite = Date.now() - dias * 24 * 60 * 60 * 1000;
-  const sensoresLote = sensores.filter((s) => s.lote_id === lote.id);
-  const registrosLote = registros
-    .filter((r) => sensoresLote.some((s) => s.id === r.sensor_id))
-    .filter((r) => {
-      if (!r.tempo_registro) return true;
-      return new Date(r.tempo_registro).getTime() >= limite;
-    })
-    .sort((a, b) => (a.tempo_registro ?? "").localeCompare(b.tempo_registro ?? ""));
+  const leiturasPeriodo = leituras.filter(
+    (leitura) => new Date(leitura.data).getTime() >= limite,
+  );
 
-  const leituras: Leitura[] = registrosLote.map(mapearLeitura);
+  const somaTemp = leiturasPeriodo.reduce((acc, curr) => acc + curr.temperatura, 0);
+  const somaUmid = leiturasPeriodo.reduce((acc, curr) => acc + curr.umidade, 0);
 
-  const somaTemp = leituras.reduce((acc, curr) => acc + curr.temperatura, 0);
-  const somaUmid = leituras.reduce((acc, curr) => acc + curr.umidade, 0);
+  const mediaTemperatura = leiturasPeriodo.length > 0 ? somaTemp / leiturasPeriodo.length : null;
+  const mediaUmidade = leiturasPeriodo.length > 0 ? somaUmid / leiturasPeriodo.length : null;
 
-  const mediaTemperatura = leituras.length > 0 ? somaTemp / leituras.length : null;
-  const mediaUmidade = leituras.length > 0 ? somaUmid / leituras.length : null;
-
-  const maisRecente = registrosLote[registrosLote.length - 1];
+  const maisRecente = leiturasPeriodo[leiturasPeriodo.length - 1];
 
   const loteResumo: LoteResumo = {
     codigo: `LOTE-${String(lote.id).padStart(2, "0")}`,
     nome: lote.fruta ? lote.fruta.charAt(0).toUpperCase() + lote.fruta.slice(1) : `Lote ${lote.id}`,
     fruta: normalizarFruta(lote.fruta),
     status: normalizarStatus(lote.status),
-    minutosAtras: calcularMinutosAtras(maisRecente?.tempo_registro),
+    minutosAtras: calcularMinutosAtras(maisRecente?.data),
   };
 
   const alertas: AlertaLote[] = [];
@@ -198,7 +257,7 @@ export async function buscarLote(codigo: string, dias = 7): Promise<DetalheLote>
 
   return {
     lote: loteResumo,
-    leituras,
+    leituras: leiturasPeriodo,
     mediaTemperatura,
     mediaUmidade,
     alertas,

@@ -46,6 +46,7 @@ export async function buscarLeituras(): Promise<Leitura[]> {
     data: reg.tempo_registro ?? new Date().toISOString(),
     temperatura: reg.temperatura_celsius,
     umidade: reg.umidade_solo ?? reg.umidade_ar ?? 0,
+    umidadeAr: reg.umidade_ar ?? 0,
   }));
 }
 
@@ -158,6 +159,7 @@ export async function buscarLote(codigo: string, dias = 7): Promise<DetalheLote>
     data: reg.tempo_registro ?? new Date().toISOString(),
     temperatura: reg.temperatura_celsius,
     umidade: reg.umidade_solo ?? reg.umidade_ar ?? 0,
+    umidadeAr: reg.umidade_ar ?? 0,
   }));
 
   const somaTemp = leituras.reduce((acc, curr) => acc + curr.temperatura, 0);

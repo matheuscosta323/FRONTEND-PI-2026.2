@@ -8,7 +8,6 @@ import { GraficoLinhas } from "@/components/monitoramento/grafico-linhas";
 import { KpiCard } from "@/components/monitoramento/kpi-card";
 import { LinhasLotes } from "@/components/monitoramento/tabela-lotes";
 import { buscarLeituras, buscarResumo } from "@/lib/api/monitoramento";
-import { CONFIG } from "@/lib/config";
 import { haMin, num } from "@/lib/format";
 import { usePolling } from "@/hooks/use-polling";
 import type { Leitura, LinhaGrafico } from "@/types/monitoramento";
@@ -105,7 +104,7 @@ export function DashboardView() {
             <div className="side-stats">
               {erro && !dados ? (
                 <p className="empty">
-                  Não foi possível falar com o servidor em {CONFIG.apiUrl}.
+                  Não foi possível carregar as leituras do ThingSpeak.
                 </p>
               ) : (
                 <>
